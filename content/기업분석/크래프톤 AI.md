@@ -1,8 +1,6 @@
 https://www.krafton.ai/ko/
 
-[[(상시) 크래프톤AI Research Engineer - Foundation Models|현재 오픈 중인 공고]]
-
-# 0317 기업분석
+# 20260317 기업분석
 ## 제미나이(링크 분석)
 ### 1. 기업 아이덴티티 및 브랜딩 (Vision & Philosophy)
 

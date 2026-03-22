@@ -1,8 +1,3 @@
----
-share_link: https://share.note.sx/kzw6hkvd#kBc+oKnjiJI23FJp4WjT5mPbRsHkduK83rIkqoDJBhs
-share_updated: 2026-03-18T17:19:27+09:00
----
-# Careers
 #### AI 전문/특화
 - [SK Careers](https://www.skcareers.com/)
 
