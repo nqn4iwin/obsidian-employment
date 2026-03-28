@@ -20,6 +20,9 @@
 
 - [NH 투자증권](https://nhqv.recruiter.co.kr/career/home)
 
+#### 교육
+- [OPIC](https://careers.multicampus.com/ko/home)
+
 #### IT
 - [카페24](https://www.cafe24corp.com/?lng=recruit&menu=jobs)
 
