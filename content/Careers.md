@@ -28,10 +28,13 @@
 
 #### 문화생활
 - [크래프톤](https://job-boards.greenhouse.io/krafton)
-	**최근 공고** [[(상시) 크래프톤AI Research Engineer - Foundation Models]]
+	[[(상시) 크래프톤AI Research Engineer - Foundation Models]]
+- 넥슨
+	[[(상시) 넥슨 메이플스토리 AI 엔지니어]]
+	[[(상시) 넥슨 플랫폼본부 던파시너지실 AI 리서치 엔지니어 (AI 어시스턴트)]]
 
 - [야놀자](https://yanolja.wd102.myworkdayjobs.com/ko-KR/External_Yanolja)
-
+- [우아한형제들](https://career.woowahan.com/)
 - [CJ 올리브 네트웍스](https://career.cjolivenetworks.co.kr/)
 
 # 인재풀

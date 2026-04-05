@@ -1,4 +1,3 @@
-
 https://kisti.fairy.im/announcement/detail/8
 
 ## 1) AI/데이터 본부 - 데이터 큐레이션센터

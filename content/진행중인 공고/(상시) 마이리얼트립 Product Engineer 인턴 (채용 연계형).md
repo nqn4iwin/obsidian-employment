@@ -23,3 +23,6 @@ https://myrealtrip.career.greetinghr.com/ko/o/162526
 - Notion·Slack·Figma 등 협업 도구 활용 능력
 
 **전형 절차** 서류전형 → 1차 면접 → 필요 시 과제 전형 → 입사
+
+**제출 서류**
+- 이력서 및 자기소개서(한 파일)
