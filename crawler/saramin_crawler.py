@@ -41,21 +41,42 @@ class SaraminCrawler:
             '유연근무제': 'wsh050', '면접후결정': 'wsh090'
         }
 
+        self.location_codes = {
+            '서울': '101000', '경기': '102000', '경기도': '102000',
+            '인천': '108000', '부산': '103000', '대구': '104000',
+            '대전': '106000', '광주': '105000', '울산': '107000',
+            '세종': '118000', '강원': '109000', '충북': '110000',
+            '충남': '111000', '전북': '112000', '전남': '113000',
+            '경북': '114000', '경남': '115000', '제주': '116000'
+        }
+
+        self.career_codes = {
+            '신입': '1', '경력없음': '1', '경력무관': '3', '경력': '2'
+        }
+
+        self.sort_codes = {
+            'recent': 'reg_dt', '최신순': 'reg_dt',
+            'relation': 'relation', '관련도순': 'relation'
+        }
+
     def load_config(self, config_path='config.yaml'):
         import yaml
         with open(config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
 
-    def search_jobs(self, keyword=None, **filters):
+    def search_jobs(self, keyword=None, sort='relation', limit=None, **filters):
         """실제 api 엔드포인트 사용한 검색"""
 
         jobs = []
         api_url = "https://www.saramin.co.kr/zf_user/search/get-recruit-list"
 
+        sort_param = self.sort_codes.get(sort, sort)
+        career_types = filters.pop('career_types', None)  # 클라이언트 사이드 필터
+
         params = {
             'searchType': 'search',
             'recruitPage': 1,
-            'recruitSort': 'relation',
+            'recruitSort': sort_param,
             'recruitPageCount': 40,
             'search_optional_item': 'y',
             'search_done': 'y',
@@ -77,11 +98,13 @@ class SaraminCrawler:
             total_count = int(json_data.get('count', '0').replace(',', ''))
             max_pages = min((total_count + 39) // 40, 5)
 
-            print(f"총 {total_count:,}개 공고 발견! {max_pages}페이지 크롤링 예정")
+            print(f"총 {total_count:,}개 공고 발견! 최대 {max_pages}페이지 크롤링")
 
             for page in range(1, max_pages + 1):
-                print(f"📄 {page}/{max_pages} 페이지 수집 중...")
+                if limit and len(jobs) >= limit:
+                    break
 
+                print(f"📄 {page}/{max_pages} 페이지 수집 중...")
                 params['recruitPage'] = page
 
                 try:
@@ -97,12 +120,14 @@ class SaraminCrawler:
                             print(f"페이지 {page}에서 공고를 찾을 수 없습니다.")
                             break
 
-                        print(f"총 └─ {len(json_items)}개 수집")
-
                         for item in json_items:
+                            if limit and len(jobs) >= limit:
+                                break
                             job_data = self.extract_job_info_from_api(item, keyword or '전체')
-                            if job_data:
+                            if job_data and self._career_matches(job_data.get('career', ''), career_types):
                                 jobs.append(job_data)
+
+                        print(f"└─ 현재까지 {len(jobs)}개 수집{'(목표 달성)' if limit and len(jobs) >= limit else ''}")
                     else:
                         print(f"페이지 {page}에서 데이터를 받지 못했습니다.")
                         break
@@ -119,6 +144,18 @@ class SaraminCrawler:
 
         print(f"✅ '{keyword or '전체'}' 총 {len(jobs)}개 공고 수집 완료!")
         return jobs
+
+    def _career_matches(self, career_field, career_types):
+        """경력 조건 클라이언트 사이드 필터"""
+        if not career_types:
+            return True
+        career_stripped = career_field.strip()
+        for ct in career_types:
+            if ct == '신입' and ('신입' in career_stripped):
+                return True
+            if ct in ('경력없음', '경력무관') and career_stripped == '경력무관':
+                return True
+        return False
 
     def _apply_filters(self, params, filters):
         """필터들을 파라미터에 적용"""
@@ -156,6 +193,13 @@ class SaraminCrawler:
 
         if 'exclude_keywords' in filters:
             params['exc_keyword'] = ','.join(filters['exclude_keywords'])
+
+        if 'locations' in filters:
+            loc_list = [self.location_codes[l] for l in filters['locations'] if l in self.location_codes]
+            if loc_list:
+                params['loc_mcd'] = ','.join(loc_list)
+
+        # career_types는 API 파라미터 미지원 → _career_matches()로 클라이언트 사이드 처리
 
 
     def extract_job_info_from_api(self, item, keyword):
@@ -224,36 +268,52 @@ class SaraminCrawler:
 
 
     def fetch_job_detail(self, rec_idx):
-        """상세 페이지에서 추가 정보 수집"""
+        """상세 페이지에서 추가 정보 수집 (AJAX 엔드포인트 사용)"""
         if not rec_idx:
             return {}
 
-        url = f"https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx={rec_idx}"
+        ajax_headers = {
+            **self.headers,
+            'Referer': f'https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx={rec_idx}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+
+        detail = {}
 
         try:
             time.sleep(0.5)
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
-            soup = BeautifulSoup(response.text, 'html.parser')
 
-            detail = {}
+            # AJAX 엔드포인트: 요약 조건 + 복리후생
+            r = requests.get(
+                'https://www.saramin.co.kr/zf_user/jobs/relay/view-ajax',
+                params={'rec_idx': rec_idx},
+                headers=ajax_headers
+            )
+            r.raise_for_status()
+            soup = BeautifulSoup(r.text, 'html.parser')
 
-            # 요약 테이블 (급여, 근무지, 직원수 등)
-            for row in soup.select('div.jv_summary table tr'):
-                th = row.select_one('th')
-                td = row.select_one('td')
-                if th and td:
-                    detail[th.get_text(strip=True)] = td.get_text(strip=True)
+            summary_cont = soup.select_one('div.jv_summary div.cont')
+            if summary_cont:
+                detail['요약정보'] = summary_cont.get_text(separator='\n', strip=True)
 
-            # 기술스택 태그
-            tags = [t.get_text(strip=True) for t in soup.select('div.jv_summary .list_tag a')]
+            benefit = soup.select_one('div.jv_benefit')
+            if benefit:
+                detail['복리후생'] = benefit.get_text(separator='\n', strip=True)
+
+            tags = [t.get_text(strip=True) for t in soup.select('div.tags .cont a')]
             if tags:
                 detail['기술스택'] = tags
 
-            # 직무 상세 내용 (담당업무, 자격요건, 우대사항, 복리후생 포함)
-            jv_detail = soup.select_one('div.jv_detail')
-            if jv_detail:
-                detail['직무내용'] = jv_detail.get_text(separator='\n', strip=True)
+            # iframe 엔드포인트: 주요업무 / 자격요건 / 우대사항
+            if soup.select_one('div.jv_detail iframe'):
+                time.sleep(0.3)
+                r2 = requests.get(
+                    'https://www.saramin.co.kr/zf_user/jobs/relay/view-detail',
+                    params={'rec_idx': rec_idx, 'rec_seq': '0'},
+                    headers=self.headers
+                )
+                r2.raise_for_status()
+                detail['직무내용'] = BeautifulSoup(r2.text, 'html.parser').get_text(separator='\n', strip=True)
 
             return detail
 
@@ -303,20 +363,7 @@ class SaraminCrawler:
             print(f"⏭️  스킵 (이미 존재): {filename}")
             return None
 
-        base_fields = {
-            'keyword', 'title', 'company', 'location', 'career', 'education',
-            'work_type', 'deadline', 'link', 'rec_idx', 'crawled_at', '기술스택', '직무내용'
-        }
-        extra_lines = ''.join(
-            f"- {k}: {v}\n" for k, v in job.items()
-            if k not in base_fields and v
-        )
-        skills = job.get('기술스택', [])
-        skills_str = f"- 기술스택: {', '.join(skills)}\n" if skills else ''
-        detail_section = f"\n**직무 내용**\n{job['직무내용']}\n" if job.get('직무내용') else ''
-
-        content = f"""**지원링크**
-{job.get('link', '')}
+        content = f"""링크: https://www.saramin.co.kr/zf_user/jobs/view?rec_idx={job.get('rec_idx', '')}
 
 **기본 정보**
 - 회사: {job.get('company') or '정보 없음'}
@@ -326,9 +373,9 @@ class SaraminCrawler:
 - 고용형태: {job.get('work_type', '정보 없음')}
 - 마감일: {job.get('deadline') or '정보 없음'}
 - 검색 키워드: {job.get('keyword', '')}
-{extra_lines}{skills_str}{detail_section}
----
-_사람인 자동 수집 — 상세 내용은 링크에서 확인_
+
+**원문**
+{job.get('직무내용', '정보 없음')}
 """
 
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -450,7 +497,7 @@ _사람인 자동 수집 — 상세 내용은 링크에서 확인_
         stats = [f"{k}({v}개)" for k, v in keyword_counts.items()]
         return ", ".join(stats)
 
-    def run_advanced_crawler(self, searches, output_dir, email_config=None):
+    def run_advanced_crawler(self, searches, output_dir, sort='relation', limit=None, email_config=None):
         """config에서 읽은 검색 조건으로 크롤링 후 MD 생성"""
         print("🚀 크롤링 시작!")
 
@@ -460,7 +507,7 @@ _사람인 자동 수집 — 상세 내용은 링크에서 확인_
             search = search.copy()
             keyword = search.pop('keyword', '')
             print(f"\n📋 '{keyword}' 검색 중...")
-            jobs = self.search_jobs(keyword=keyword, **search)
+            jobs = self.search_jobs(keyword=keyword, sort=sort, limit=limit, **search)
             all_jobs.extend(jobs)
             print(f"✅ {len(jobs)}개 공고 수집")
 
@@ -500,6 +547,9 @@ if __name__ == "__main__":
 
     print(f"📁 출력 경로: {output_dir}")
 
+    sort = config.get('sort', 'relation')
+    limit = config.get('limit', None)
+
     email_config = None
     if os.environ.get('EMAIL_SENDER'):
         email_config = {
@@ -511,5 +561,7 @@ if __name__ == "__main__":
     crawler.run_advanced_crawler(
         searches=config['searches'],
         output_dir=output_dir,
+        sort=sort,
+        limit=limit,
         email_config=email_config
     )
