@@ -202,7 +202,7 @@ class SaraminCrawler:
 
             rec_idx = item.get('value', '')
 
-            return {
+            job = {
                 'keyword': keyword,
                 'title': title,
                 'company': company,
@@ -215,11 +215,51 @@ class SaraminCrawler:
                 'rec_idx': rec_idx,
                 'crawled_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
+            job.update(self.fetch_job_detail(rec_idx))
+            return job
 
         except Exception as e:
             print(f"⚠️ 공고 정보 추출 실패 : {e}")
             return None
 
+
+    def fetch_job_detail(self, rec_idx):
+        """상세 페이지에서 추가 정보 수집"""
+        if not rec_idx:
+            return {}
+
+        url = f"https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx={rec_idx}"
+
+        try:
+            time.sleep(0.5)
+            response = requests.get(url, headers=self.headers)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            detail = {}
+
+            # 요약 테이블 (급여, 근무지, 직원수 등)
+            for row in soup.select('div.jv_summary table tr'):
+                th = row.select_one('th')
+                td = row.select_one('td')
+                if th and td:
+                    detail[th.get_text(strip=True)] = td.get_text(strip=True)
+
+            # 기술스택 태그
+            tags = [t.get_text(strip=True) for t in soup.select('div.jv_summary .list_tag a')]
+            if tags:
+                detail['기술스택'] = tags
+
+            # 직무 상세 내용 (담당업무, 자격요건, 우대사항, 복리후생 포함)
+            jv_detail = soup.select_one('div.jv_detail')
+            if jv_detail:
+                detail['직무내용'] = jv_detail.get_text(separator='\n', strip=True)
+
+            return detail
+
+        except Exception as e:
+            print(f"⚠️ 상세 페이지 수집 실패 ({rec_idx}): {e}")
+            return {}
 
     def save_to_csv(self, jobs, filename=None):
         """결과를 csv로 저장"""
@@ -263,6 +303,18 @@ class SaraminCrawler:
             print(f"⏭️  스킵 (이미 존재): {filename}")
             return None
 
+        base_fields = {
+            'keyword', 'title', 'company', 'location', 'career', 'education',
+            'work_type', 'deadline', 'link', 'rec_idx', 'crawled_at', '기술스택', '직무내용'
+        }
+        extra_lines = ''.join(
+            f"- {k}: {v}\n" for k, v in job.items()
+            if k not in base_fields and v
+        )
+        skills = job.get('기술스택', [])
+        skills_str = f"- 기술스택: {', '.join(skills)}\n" if skills else ''
+        detail_section = f"\n**직무 내용**\n{job['직무내용']}\n" if job.get('직무내용') else ''
+
         content = f"""**지원링크**
 {job.get('link', '')}
 
@@ -274,7 +326,7 @@ class SaraminCrawler:
 - 고용형태: {job.get('work_type', '정보 없음')}
 - 마감일: {job.get('deadline') or '정보 없음'}
 - 검색 키워드: {job.get('keyword', '')}
-
+{extra_lines}{skills_str}{detail_section}
 ---
 _사람인 자동 수집 — 상세 내용은 링크에서 확인_
 """
