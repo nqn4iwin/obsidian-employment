@@ -1,14 +1,10 @@
 ---
-title: Welcome to Quartz
+title: Job Description
 ---
-# Job Description
-
 강사님이 만들지 말라 한 공고 아카이브입니다ㅎ
 
 ## 진행중인 공고
 #### 마감기한 있음
-- [[(0428) 한국공항공사 공무직(AI·데이터분석) 공개채용]]
-- [[(0430) 2026년 이지케어텍 신입 개발자 채용 (채용연계형 인턴)]]
 - [[(0503) (주)네비웍스 AI 서비스 백엔드 개발자(신입)]]
 - [[(0531) 2026년 해커스 교육그룹 수시 채용]]
 - [[(0607) 슈어소프트테크 AI시험인증2 - AI 검증 및 개발]]
@@ -16,4 +12,4 @@ title: Welcome to Quartz
 #### 상시공고
 - [[(상시) 사이오닉AI Large Language Model Researcher]]
 - [[(상시) 업스테이지 AI Research Engineer - LLM Eval Internship]]
-- [[(상시) 크래프톤AI Research Engineer - Foundation Models]
+- [[(상시) 크래프톤AI Research Engineer - Foundation Models]]
