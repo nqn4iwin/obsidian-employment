@@ -1,3 +1,9 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
+from dotenv import load_dotenv
+load_dotenv()
+
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -363,7 +369,10 @@ class SaraminCrawler:
             print(f"⏭️  스킵 (이미 존재): {filename}")
             return None
 
-        content = f"""링크: https://www.saramin.co.kr/zf_user/jobs/view?rec_idx={job.get('rec_idx', '')}
+        content = f"""---
+draft: true
+---
+링크: https://www.saramin.co.kr/zf_user/jobs/view?rec_idx={job.get('rec_idx', '')}
 
 **기본 정보**
 - 회사: {job.get('company') or '정보 없음'}
@@ -373,6 +382,9 @@ class SaraminCrawler:
 - 고용형태: {job.get('work_type', '정보 없음')}
 - 마감일: {job.get('deadline') or '정보 없음'}
 - 검색 키워드: {job.get('keyword', '')}
+
+**요약**
+
 
 **원문**
 {job.get('직무내용', '정보 없음')}
@@ -511,13 +523,14 @@ class SaraminCrawler:
             all_jobs.extend(jobs)
             print(f"✅ {len(jobs)}개 공고 수집")
 
-        # 중복 제거
+        # 중복 제거 (rec_idx 기준)
         unique_jobs = []
-        seen_links = set()
+        seen = set()
         for job in all_jobs:
-            if job['link'] not in seen_links:
+            key = job.get('rec_idx') or job.get('link')
+            if key not in seen:
                 unique_jobs.append(job)
-                seen_links.add(job['link'])
+                seen.add(key)
 
         print(f"\n🎉 총 {len(unique_jobs)}개 고유 공고 수집!")
 
@@ -530,25 +543,70 @@ class SaraminCrawler:
 
         print(f"\n📝 {saved_count}개 MD 파일 생성 완료 → {output_dir}")
 
+        if saved_count > 0:
+            self.save_daily_summary(unique_jobs, output_dir)
+
         if email_config and unique_jobs:
             self.send_email_notification(unique_jobs, email_config)
 
         return unique_jobs
 
+    def save_daily_summary(self, jobs, output_dir):
+        """오늘의 공고 요약 MD 생성 (content/ 루트에 저장)"""
+        content_dir = os.path.dirname(output_dir)
+        filepath = os.path.join(content_dir, '오늘의 공고.md')
+
+        rows = '\n'.join(
+            f"| {job.get('company') or '?'} | {re.sub(r'[|]', '', job.get('title') or '?')} | {job.get('deadline') or '?'} | {self._safe_filename(job)} |"
+            for job in jobs
+        )
+
+        content = f"""---
+draft: true
+---
+# 오늘의 수집 공고 ({datetime.now().strftime('%Y-%m-%d')})
+
+| 회사 | 직무 | 마감일 | 파일명 |
+|------|------|--------|--------|
+{rows}
+"""
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"📋 오늘의 공고.md 업데이트 완료 ({len(jobs)}건)")
+
+    def _safe_filename(self, job):
+        """save_to_md와 동일한 파일명 생성"""
+        deadline_raw = job.get('deadline') or ''
+        match = re.search(r'(\d{2})/(\d{2})', deadline_raw)
+        if match:
+            deadline_code = match.group(1) + match.group(2)
+        elif '상시' in deadline_raw:
+            deadline_code = '상시'
+        else:
+            deadline_code = '미정'
+        company = re.sub(r'[\\/:*?"<>|\n]', '', job.get('company') or '회사미상').strip()
+        title = re.sub(r'[\\/:*?"<>|\n]', '', job.get('title') or '제목미상').strip()
+        filename = f"({deadline_code}) {company} {title}.md"
+        return filename[:96] + ".md" if len(filename) > 100 else filename
+
 
 if __name__ == "__main__":
-    crawler = SaraminCrawler()
-    config = crawler.load_config('config.yaml')
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--limit', type=int, help='키워드당 최대 수집 건수 (config.yaml의 limit 덮어씀)')
+    args = parser.parse_args()
 
-    # output_dir은 이 스크립트 위치 기준 상대경로로 해석
+    crawler = SaraminCrawler()
     script_dir = os.path.dirname(os.path.abspath(__file__))
+    config = crawler.load_config(os.path.join(script_dir, 'config.yaml'))
+
     output_dir_raw = config.get('output_dir', '../content/진행중인 공고')
     output_dir = os.path.normpath(os.path.join(script_dir, output_dir_raw))
 
     print(f"📁 출력 경로: {output_dir}")
 
     sort = config.get('sort', 'relation')
-    limit = config.get('limit', None)
+    limit = args.limit if args.limit is not None else config.get('limit', None)
 
     email_config = None
     if os.environ.get('EMAIL_SENDER'):
