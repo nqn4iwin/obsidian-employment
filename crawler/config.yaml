@@ -1,4 +1,4 @@
-output_dir: "../content/진행중인 공고"
+output_dir: "../content/수집 공고"
 sort: "recent"   # recent(최신순) / relation(관련도순)
 limit: 10        # 키워드당 최대 수집 건수
 

@@ -30,14 +30,14 @@ def summarize(job_text: str) -> str | None:
 
 def process(filename: str):
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    filepath = os.path.join(root_dir, 'content', '진행중인 공고', filename)
-    filepath = os.path.normpath(filepath)
+    src_path = os.path.normpath(os.path.join(root_dir, 'content', '수집 공고', filename))
+    dst_path = os.path.normpath(os.path.join(root_dir, 'content', '진행 공고', filename))
 
-    if not os.path.exists(filepath):
-        print(f"❌ 파일을 찾을 수 없습니다: {filepath}")
+    if not os.path.exists(src_path):
+        print(f"❌ 파일을 찾을 수 없습니다: {src_path}")
         sys.exit(1)
 
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(src_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
     match = re.search(r'\*\*원문\*\*\n(.*)', content, re.DOTALL)
@@ -51,21 +51,41 @@ def process(filename: str):
     if summary is None:
         sys.exit(1)
 
-    content = re.sub(
+    updated = re.sub(
         r'(\*\*요약\*\*\n)\n(\n\*\*원문\*\*)',
         rf'\g<1>{summary}\n\g<2>',
         content
     )
-    content = re.sub(r'^---\ndraft: true\n---\n', '', content)
+    if updated == content:
+        print("❌ **요약** 섹션을 찾을 수 없습니다. 파일 형식을 확인하세요.")
+        sys.exit(1)
+    content = re.sub(r'^---\ndraft: true\n---\n', '', updated)
+    content = re.sub(r'\n\*\*원문\*\*\n.*', '', content, flags=re.DOTALL).rstrip() + '\n'
 
-    with open(filepath, 'w', encoding='utf-8') as f:
+    os.makedirs(os.path.dirname(dst_path), exist_ok=True)
+    with open(dst_path, 'w', encoding='utf-8') as f:
         f.write(content)
 
-    print(f"✅ 완료: {filename}")
+    os.remove(src_path)
+    print(f"✅ 완료: {filename} → 진행 공고/")
+
+
+def process_all():
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    staging_dir = os.path.normpath(os.path.join(root_dir, 'content', '수집 공고'))
+    files = [f for f in os.listdir(staging_dir) if f.endswith('.md')]
+
+    if not files:
+        print("수집 공고에 파일이 없습니다.")
+        return
+
+    print(f"총 {len(files)}개 변환 시작\n")
+    for filename in files:
+        process(filename)
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("사용법: py converter/converter.py \"파일명.md\"")
-        sys.exit(1)
-    process(sys.argv[1])
+        process_all()
+    else:
+        process(sys.argv[1])
