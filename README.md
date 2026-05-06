@@ -21,6 +21,8 @@ quartz/
 ├── converter/
 │   ├── converter.py       # LLM 요약 변환기
 │   └── prompt_template.py # Solar Pro 시스템 프롬프트
+├── scripts/
+│   └── build_index.py     # index.md 자동 생성
 └── .github/workflows/
     └── crawl.yml          # GitHub Actions 크롤링 워크플로우
 ```
@@ -49,7 +51,15 @@ py converter/converter.py
 
 `수집 공고/`에 남은 파일 전체를 Solar Pro API로 요약하여 `진행 공고/`로 이동시킵니다. 원문은 제거되고 요약본만 저장됩니다.
 
-### 4. 커밋 & 배포
+### 4. 인덱스 재생성
+
+```bash
+py scripts/build_index.py
+```
+
+`진행 공고/` 목록을 읽어 `content/index.md`를 자동으로 덮어씁니다.
+
+### 5. 커밋 & 배포
 
 ```bash
 git add content/

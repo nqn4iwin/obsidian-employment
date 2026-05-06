@@ -365,7 +365,10 @@ class SaraminCrawler:
 
         filepath = os.path.join(output_dir, filename)
 
-        if os.path.exists(filepath):
+        content_dir = os.path.dirname(output_dir)
+        active_path = os.path.join(content_dir, '진행 공고', filename)
+
+        if os.path.exists(filepath) or os.path.exists(active_path):
             print(f"⏭️  스킵 (이미 존재): {filename}")
             return None
 
