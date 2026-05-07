@@ -28,10 +28,15 @@ def summarize(job_text: str) -> str | None:
     return resp.choices[0].message.content
 
 
+def sanitize_filename(filename: str) -> str:
+    return re.sub(r'[\[\]|#^]', '', filename)
+
+
 def process(filename: str):
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     src_path = os.path.normpath(os.path.join(root_dir, 'content', '수집 공고', filename))
-    dst_path = os.path.normpath(os.path.join(root_dir, 'content', '진행 공고', filename))
+    dst_filename = sanitize_filename(filename)
+    dst_path = os.path.normpath(os.path.join(root_dir, 'content', '진행 공고', dst_filename))
 
     if not os.path.exists(src_path):
         print(f"❌ 파일을 찾을 수 없습니다: {src_path}")

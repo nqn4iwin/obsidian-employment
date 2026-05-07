@@ -353,7 +353,7 @@ class SaraminCrawler:
         elif '상시' in deadline_raw:
             deadline_code = '상시'
         else:
-            deadline_code = '미정'
+            deadline_code = '채용시마감'
 
         # 파일명 안전 처리 (Windows 금지 문자 제거)
         company = re.sub(r'[\\/:*?"<>|\n]', '', job.get('company') or '회사미상').strip()
@@ -586,7 +586,7 @@ draft: true
         elif '상시' in deadline_raw:
             deadline_code = '상시'
         else:
-            deadline_code = '미정'
+            deadline_code = '채용시마감'
         company = re.sub(r'[\\/:*?"<>|\n]', '', job.get('company') or '회사미상').strip()
         title = re.sub(r'[\\/:*?"<>|\n]', '', job.get('title') or '제목미상').strip()
         filename = f"({deadline_code}) {company} {title}.md"
