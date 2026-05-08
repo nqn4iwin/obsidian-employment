@@ -15,14 +15,17 @@ quartz/
 │   ├── 기업분석/          # 수동 작성 기업 분석 노트
 │   └── index.md
 ├── crawler/
+│   ├── core.py            # 공통 베이스 클래스 (OCR, MD 저장 등)
 │   ├── saramin_crawler.py
+│   ├── jobkorea_crawler.py  # 구현 예정
+│   ├── groupby_crawler.py   # 구현 예정
 │   ├── config.yaml        # 검색 키워드·필터 설정
 │   └── requirements.txt
 ├── converter/
 │   ├── converter.py       # LLM 요약 변환기
 │   └── prompt_template.py # Solar Pro 시스템 프롬프트
 ├── scripts/
-│   └── build_index.py     # index.md 자동 생성
+│   └── build_index.py     # 만료 공고 이동 + index.md 자동 생성
 └── .github/workflows/
     └── crawl.yml          # GitHub Actions 크롤링 워크플로우
 ```
@@ -38,6 +41,18 @@ py crawler/saramin_crawler.py
 ```
 
 `config.yaml`에 설정된 키워드로 사람인을 검색하여 `content/수집 공고/`에 MD 파일로 저장합니다.
+
+특정 공고를 URL로 직접 수집할 수도 있습니다.
+
+```bash
+py crawler/saramin_crawler.py --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678
+```
+
+채용공고 내용이 이미지로만 구성된 경우 `--image` 플래그를 추가하면 텍스트 추출을 건너뛰고 Upstage OCR로 이미지에서 직접 텍스트를 뽑습니다.
+
+```bash
+py crawler/saramin_crawler.py --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678 --image
+```
 
 ### 2. 검토 및 정리
 
@@ -57,7 +72,7 @@ py converter/converter.py
 py scripts/build_index.py
 ```
 
-`진행 공고/` 목록을 읽어 `content/index.md`를 자동으로 덮어씁니다.
+마감일이 지난 공고를 `진행 공고/`에서 `마감 공고/`로 자동 이동한 뒤, `content/index.md`를 재생성합니다.
 
 ### 5. 커밋 & 배포
 
