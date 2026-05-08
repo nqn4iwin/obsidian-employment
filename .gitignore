@@ -11,3 +11,5 @@ private/
 replit.nix
 .env
 .env.example
+__pycache__/
+*.pyc
