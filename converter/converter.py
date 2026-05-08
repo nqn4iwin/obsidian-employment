@@ -45,7 +45,7 @@ def process(filename: str):
     with open(src_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    match = re.search(r'\*\*원문\*\*\n(.*)', content, re.DOTALL)
+    match = re.search(r'\*\*원문\*\*[^\n]*\n(.*)', content, re.DOTALL)
     if not match:
         print("❌ **원문** 섹션을 찾을 수 없습니다.")
         sys.exit(1)
@@ -57,7 +57,7 @@ def process(filename: str):
         sys.exit(1)
 
     updated = re.sub(
-        r'(\*\*요약\*\*\n)\n(\n\*\*원문\*\*)',
+        r'(\*\*요약\*\*\n)\n(\n\*\*원문\*\*[^\n]*)',
         rf'\g<1>{summary}\n\g<2>',
         content
     )
@@ -65,7 +65,7 @@ def process(filename: str):
         print("❌ **요약** 섹션을 찾을 수 없습니다. 파일 형식을 확인하세요.")
         sys.exit(1)
     content = re.sub(r'^---\ndraft: true\n---\n', '', updated)
-    content = re.sub(r'\n\*\*원문\*\*\n.*', '', content, flags=re.DOTALL).rstrip() + '\n'
+    content = re.sub(r'\n\*\*원문\*\*[^\n]*\n.*', '', content, flags=re.DOTALL).rstrip() + '\n'
 
     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
     with open(dst_path, 'w', encoding='utf-8') as f:
