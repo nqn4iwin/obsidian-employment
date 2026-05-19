@@ -32,12 +32,32 @@ quartz/
 
 ---
 
+## 개발 환경 (uv)
+
+Python 의존성과 스크립트는 [uv](https://docs.astral.sh/uv/)로 관리합니다. 저장소 루트에서 한 번만 동기화하면 됩니다.
+
+```bash
+uv sync
+```
+
+환경 변수(`LLM_API_KEY` 등)는 프로젝트 루트의 `.env`에 두면 됩니다.
+
+| 명령 | 설명 |
+|------|------|
+| `uv run crawl` | 사람인 크롤러 실행 |
+| `uv run convert` | LLM 요약 변환 |
+| `uv run index` | 만료 공고 이동 + index.md 생성 |
+
+추가 인자는 `--` 뒤에 넘깁니다. 예: `uv run crawl -- --link <URL> --image`
+
+---
+
 ## 운영 프로세스
 
 ### 1. 공고 수집
 
 ```bash
-py crawler/saramin_crawler.py
+uv run crawl
 ```
 
 `config.yaml`에 설정된 키워드로 사람인을 검색하여 `content/수집 공고/`에 MD 파일로 저장합니다.
@@ -45,13 +65,13 @@ py crawler/saramin_crawler.py
 특정 공고를 URL로 직접 수집할 수도 있습니다.
 
 ```bash
-py crawler/saramin_crawler.py --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678
+uv run crawl -- --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678
 ```
 
 채용공고 내용이 이미지로만 구성된 경우 `--image` 플래그를 추가하면 텍스트 추출을 건너뛰고 Upstage OCR로 이미지에서 직접 텍스트를 뽑습니다.
 
 ```bash
-py crawler/saramin_crawler.py --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678 --image
+uv run crawl -- --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678 --image
 ```
 
 ### 2. 검토 및 정리
@@ -61,7 +81,7 @@ py crawler/saramin_crawler.py --link https://www.saramin.co.kr/zf_user/jobs/view
 ### 3. LLM 변환
 
 ```bash
-py converter/converter.py
+uv run convert
 ```
 
 `수집 공고/`에 남은 파일 전체를 Solar Pro API로 요약하여 `진행 공고/`로 이동시킵니다. 원문은 제거되고 요약본만 저장됩니다.
@@ -69,7 +89,7 @@ py converter/converter.py
 ### 4. 인덱스 재생성
 
 ```bash
-py scripts/build_index.py
+uv run index
 ```
 
 마감일이 지난 공고를 `진행 공고/`에서 `마감 공고/`로 자동 이동한 뒤, `content/index.md`를 재생성합니다.
