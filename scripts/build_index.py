@@ -56,7 +56,10 @@ def build_index():
     dated.sort(key=lambda x: x[0])
     ongoing.sort()
 
-    lines = ['---', 'title: Job Description', '---', f'[GitHub]({GITHUB_URL})', '', '## 진행 공고', '']
+    lines = ['---', 'title: Job Description', '---', f'[GitHub]({GITHUB_URL})', '',
+             f'목록 정리일: {datetime.now():%Y-%m-%d}', '',
+             '수집 공고는 검토 후 게시합니다. 상시·채용시마감 공고의 모집 여부는 원문에서 확인해 주세요.', '',
+             '## 진행 공고', '']
 
     if dated:
         lines.append('#### 마감기한 있음')

@@ -3,10 +3,18 @@ sort: "recent"   # recent(최신순) / relation(관련도순)
 limit: 10        # 키워드당 최대 수집 건수
 
 searches:
-  - keyword: "NLP"
-    career_types: ["신입", "경력없음"]
-    locations: ["서울", "경기도"]
+  - keyword: "FDE"
+    career_types: ["신입", "경력무관", "1년"]
+    locations: ["서울"]
 
-  - keyword: "자연어처리"
-    career_types: ["신입", "경력없음"]
-    locations: ["서울", "경기도"]
+  - keyword: "LLMOps"
+    career_types: ["신입", "경력무관", "1년"]
+    locations: ["서울"]
+
+  - keyword: "ML 엔지니어"
+    career_types: ["신입", "경력무관", "1년"]
+    locations: ["서울"]
+
+  - keyword: "모델학습"
+    career_types: ["신입", "경력무관", "1년"]
+    locations: ["서울"]

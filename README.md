@@ -48,7 +48,7 @@ uv sync
 | `uv run convert` | LLM 요약 변환 |
 | `uv run index` | 만료 공고 이동 + index.md 생성 |
 
-추가 인자는 `--` 뒤에 넘깁니다. 예: `uv run crawl -- --link <URL> --image`
+추가 인자는 명령 뒤에 바로 넘깁니다. 예: `uv run crawl --link <URL> --image`
 
 ---
 
@@ -65,13 +65,13 @@ uv run crawl
 특정 공고를 URL로 직접 수집할 수도 있습니다.
 
 ```bash
-uv run crawl -- --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678
+uv run crawl --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678
 ```
 
 채용공고 내용이 이미지로만 구성된 경우 `--image` 플래그를 추가하면 텍스트 추출을 건너뛰고 Upstage OCR로 이미지에서 직접 텍스트를 뽑습니다.
 
 ```bash
-uv run crawl -- --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678 --image
+uv run crawl --link https://www.saramin.co.kr/zf_user/jobs/view?rec_idx=12345678 --image
 ```
 
 ### 2. 검토 및 정리
@@ -110,22 +110,26 @@ git push origin v4
 
 `crawler/config.yaml`에서 검색 조건을 설정합니다.
 
+현재 검색 키워드는 `FDE`, `LLMOps`, `ML 엔지니어`, `모델학습`입니다.
+`LLMOps`는 `LLMOps 엔지니어` 공고도 포함하도록 넓게 검색합니다.
+현재 지역은 서울이며, 경력은 신입·경력무관·1년 경력을 포함합니다.
+
 ```yaml
 output_dir: "../content/수집 공고"
 sort: "recent"   # recent(최신순) / relation(관련도순)
 limit: 10        # 키워드당 최대 수집 건수
 
 searches:
-  - keyword: "NLP"
-    career_types: ["신입", "경력없음"]
-    locations: ["서울", "경기도"]
+  - keyword: "ML 엔지니어"
+    career_types: ["신입", "경력무관", "1년"]
+    locations: ["서울"]
 ```
 
 | 옵션 | 설명 |
 |------|------|
 | `sort` | `recent` = 최신순, `relation` = 관련도순 |
 | `limit` | 키워드당 최대 수집 건수 |
-| `career_types` | `신입`, `경력없음`(경력무관), `경력무관`, `경력` |
+| `career_types` | `신입`, `경력없음`(경력무관), `경력무관`, `1년`(1년 이상·1~3년 등 포함) |
 | `locations` | 서울, 경기도, 인천, 부산 등 광역시/도 단위 |
 
 - 동일 공고 중복 수집 방지 (rec_idx 기준)

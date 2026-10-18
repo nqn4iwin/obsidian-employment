@@ -89,7 +89,7 @@ class SaraminCrawler(BaseCrawler):
         self._apply_filters(params, filters)
 
         try:
-            response = requests.get(api_url, params=params, headers=self.headers)
+            response = requests.get(api_url, params=params, headers=self.headers, timeout=30)
             response.raise_for_status()
 
             json_data = response.json()
@@ -106,7 +106,7 @@ class SaraminCrawler(BaseCrawler):
                 params['recruitPage'] = page
 
                 try:
-                    response = requests.get(api_url, params=params, headers=self.headers)
+                    response = requests.get(api_url, params=params, headers=self.headers, timeout=30)
                     response.raise_for_status()
                     json_data = response.json()
 
@@ -123,6 +123,7 @@ class SaraminCrawler(BaseCrawler):
                                 break
                             job_data = self.extract_job_info_from_api(item, keyword or '전체')
                             if job_data and self._career_matches(job_data.get('career', ''), career_types):
+                                job_data.update(self.fetch_job_detail(job_data['rec_idx']))
                                 jobs.append(job_data)
 
                         print(f"└─ 현재까지 {len(jobs)}개 수집{'(목표 달성)' if limit and len(jobs) >= limit else ''}")
@@ -152,6 +153,8 @@ class SaraminCrawler(BaseCrawler):
             if ct == '신입' and ('신입' in career_stripped):
                 return True
             if ct in ('경력없음', '경력무관') and career_stripped == '경력무관':
+                return True
+            if ct == '1년' and re.search(r'(?<!\d)1\s*(?:년|[~∼～–-]\s*\d+\s*년)', career_stripped):
                 return True
         return False
 
@@ -251,7 +254,6 @@ class SaraminCrawler(BaseCrawler):
                 'rec_idx': rec_idx,
                 'crawled_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
-            job.update(self.fetch_job_detail(rec_idx))
             return job
 
         except Exception as e:
@@ -286,7 +288,7 @@ class SaraminCrawler(BaseCrawler):
             r = requests.get(
                 'https://www.saramin.co.kr/zf_user/jobs/relay/view-ajax',
                 params={'rec_idx': rec_idx},
-                headers=ajax_headers
+                headers=ajax_headers, timeout=30
             )
             r.raise_for_status()
             soup = BeautifulSoup(r.text, 'html.parser')
@@ -308,7 +310,7 @@ class SaraminCrawler(BaseCrawler):
                 r2 = requests.get(
                     'https://www.saramin.co.kr/zf_user/jobs/relay/view-detail',
                     params={'rec_idx': rec_idx, 'rec_seq': '0'},
-                    headers=self.headers
+                    headers=self.headers, timeout=30
                 )
                 r2.raise_for_status()
                 soup2 = BeautifulSoup(r2.text, 'html.parser')
@@ -355,7 +357,7 @@ class SaraminCrawler(BaseCrawler):
         rec_idx = match.group(1)
 
         try:
-            r = requests.get(url, headers=self.headers)
+            r = requests.get(url, headers=self.headers, timeout=30)
             r.raise_for_status()
             soup = BeautifulSoup(r.text, 'html.parser')
 
@@ -381,7 +383,7 @@ class SaraminCrawler(BaseCrawler):
             r2 = requests.get(
                 'https://www.saramin.co.kr/zf_user/jobs/relay/view-ajax',
                 params={'rec_idx': rec_idx},
-                headers=ajax_headers
+                headers=ajax_headers, timeout=30
             )
             r2.raise_for_status()
             soup2 = BeautifulSoup(r2.text, 'html.parser')
