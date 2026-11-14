@@ -40,7 +40,11 @@ Agentforce(Agent AI) / Marketing & Data Cloud
 Insider / Eloqua / VMO / Hubspot
 구글 클라우드 / Google Workspace 영업 담당자
 (신입 및 경력 3년차)
-담당업무
+
+## 팀 요약
+공고에 미기재
+
+## 주요 업무
 Google Cloud / Google Workspace 영업 및 고객 관리
 ㆍGoogle Cloud, Google Workspace 기존 고객 관리 및 계약 유지
 ㆍ고객 사용 현황, 계약 기간, 갱신 일정, 청구 이슈 관리
@@ -56,13 +60,15 @@ Google Cloud / Google Workspace 영업 및 고객 관리
 ㆍ고객 이슈 발생 시 내부 담당 부서와 협업하여 해결 지원
 ㆍGoogle Cloud / GWS 관련 영업 자료, 제안 자료, 고객 관리 자료 작성
 ㆍGoogle 및 파트너 채널과의 커뮤니케이션 지원
-자격요건
+
+## 필수 요건
 ㆍ신입 또는 경력 지원 가능
 ㆍIT, 클라우드, SaaS, 솔루션 영업에 관심이 있는 분
 ㆍ고객 커뮤니케이션 및 관계 관리 역량을 보유한 분
 ㆍ기본적인 문서 작성, 견적 관리, 매출 관리 업무가 가능한 분
 ㆍ내부 부서 및 외부 파트너와 원활하게 협업할 수 있는 분
-우대사항
+
+## 우대 요건
 ㆍGoogle Cloud 또는 Google Workspace 비즈니스 관련 영업 실무 경험 보유자
 ㆍ클라우드 리셀러, MSP, SaaS, IT 솔루션 영업 경험 보유자
 ㆍB2B 고객 관리 및 계약 갱신 업무 경험 보유자
@@ -89,7 +95,8 @@ https://www.goldenplanet.co.kr/about_us/company
 업계 연혁
 ㆍ골든플래닛의 현재이자 미래, 든든한 골든플래닛 현직자들의 리얼스토리를 공유합니다.
 https://www.goldenplanet.co.kr/about_us/recruit/career
-전형절차
+
+## 전형 절차
 접수기간 및 방법
 ㆍ접수기간 :
 2026년 07월 08일 마감
@@ -98,21 +105,6 @@ https://www.goldenplanet.co.kr/about_us/recruit/career
 ㆍ제출서류 : 사람인 온라인 이력서
 유의사항
 ㆍ입사지원 서류에 허위사실이 발견될 경우, 채용확정 이후라도 채용이 취소될 수 있습니다.
-
-## 팀 요약
-공고에 미기재
-
-## 주요 업무
-공고에 미기재
-
-## 필수 요건
-공고에 미기재
-
-## 우대 요건
-공고에 미기재
-
-## 전형 절차
-공고에 미기재
 
 ## 제출 서류
 공고에 미기재
