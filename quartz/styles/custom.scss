@@ -1,3 +1,16 @@
 @use "./base.scss";
 
 // put your custom CSS here!
+
+/* Weekly employment home: generated content is isolated from other note pages. */
+.employment-home {
+  .employment-period { color: var(--gray); font-size: .9rem; }
+  .employment-search { padding: 1rem; background: var(--highlight); border-radius: 10px; }
+  h2 span { font-size: .8em; color: var(--gray); font-weight: 400; }
+  .employment-jobs { padding-left: 1.25rem; li { padding: .45rem 0; } }
+  .employment-previous { margin: 1.5rem 0; padding: 1rem; border: 1px solid var(--lightgray); border-radius: 10px; summary { cursor: pointer; font-weight: 600; } }
+  .employment-insight { border-top: 1px solid var(--lightgray); padding-top: .5rem; margin-top: 2rem; }
+  .employment-tags { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; li { padding: .35rem .7rem; border-radius: 20px; background: var(--highlight); } span { color: var(--gray); font-size: .85em; } }
+  .employment-trend { font-size: 1.1rem; line-height: 1.8; }
+  .employment-note { color: var(--gray); font-size: .85rem; }
+}

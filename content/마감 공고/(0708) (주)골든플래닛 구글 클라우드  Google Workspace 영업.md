@@ -1,9 +1,14 @@
 ---
 draft: true
+job_id: '54123269'
+site_published_at: '2026-10-18'
+title: (주)골든플래닛 / 구글 클라우드  Google Workspace 영업
+deadline_date: '2026-07-08'
+deadline_basis: 원문 월일·요일과 Git 최초 게시 연도 교차 확인
 ---
-링크: https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54123269&location=ts&searchword=AI+Agent&searchType=search&paid_fl=n&search_uuid=23daadd6-f5b8-4644-ae9d-055bef951312
 
-**기본 정보**
+## 기본정보
+링크: https://www.saramin.co.kr/zf_user/jobs/relay/view?view_type=search&rec_idx=54123269&location=ts&searchword=AI+Agent&searchType=search&paid_fl=n&search_uuid=23daadd6-f5b8-4644-ae9d-055bef951312
 - 회사: (주)골든플래닛
 - 위치: 서울 강남구
 - 경력: 신입·경력
@@ -11,11 +16,6 @@ draft: true
 - 고용형태: 정규직
 - 마감일: ~ 07/08(수)
 - 검색 키워드: AI Agent
-
-**요약**
-
-
-**원문**
 채용공고 상세
 Global AI Agent Platform & Hybrid Cloud Tech Company
 생성형 AI와 글로벌 빅테크 솔루션을 통해 데이터 그 이상의 가치를 만드는 골든플래닛입니다.
@@ -69,7 +69,6 @@ Google Cloud / Google Workspace 영업 및 고객 관리
 ㆍ클라우드 사용량 기반 과금, 라이선스 과금, 청구 관리 경험 보유자
 ㆍGoogle Cloud, AWS, Azure 등 퍼블릭 클라우드에 대한 이해가 있는 분
 ㆍGoogle Workspace, Microsoft 365 등 협업 솔루션 영업 경험 보유자
-근무조건
 ㆍ고용형태 : 정규직
 ㆍ급여 : 면접 후 결정
 ㆍ근무지 : 서울 강남구 언주로 535, 골든플래닛 타워
@@ -99,3 +98,21 @@ https://www.goldenplanet.co.kr/about_us/recruit/career
 ㆍ제출서류 : 사람인 온라인 이력서
 유의사항
 ㆍ입사지원 서류에 허위사실이 발견될 경우, 채용확정 이후라도 채용이 취소될 수 있습니다.
+
+## 팀 요약
+공고에 미기재
+
+## 주요 업무
+공고에 미기재
+
+## 필수 요건
+공고에 미기재
+
+## 우대 요건
+공고에 미기재
+
+## 전형 절차
+공고에 미기재
+
+## 제출 서류
+공고에 미기재
