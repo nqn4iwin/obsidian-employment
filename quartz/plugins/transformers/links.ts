@@ -125,9 +125,10 @@ export const CrawlLinks: QuartzTransformerPlugin<Partial<Options>> = (userOpts) 
                   node.properties["data-slug"] = full
                 }
 
-                // rewrite link internals if prettylinks is on
+                // shorten path labels while preserving explicit link labels
                 if (
                   opts.prettyLinks &&
+                  !classes.includes("alias") &&
                   isInternal &&
                   node.children.length === 1 &&
                   node.children[0].type === "text" &&
